@@ -1,0 +1,22 @@
+{
+  "name": "khushikashish",
+  "displayName": "NLP_natwest",
+  "description": "Hackathon",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "activationEvents": [
+    "onCommand:extension.generateCode"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.generateCode",
+        "title": "Generate Code"
+      }
+    ]
+  }
+}
+
