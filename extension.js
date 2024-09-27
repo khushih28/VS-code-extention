@@ -30,7 +30,7 @@ function activate(context) {
             }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer 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'  // Using the API key
+                    'Authorization': 'Bearer "your api key'  // Using the API key
                 }
             });
 
