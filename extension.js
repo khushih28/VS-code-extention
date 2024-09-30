@@ -21,7 +21,7 @@ function activate(context) {
             }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer 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`,
+                    'Authorization': `Bearer Your_api_key`,
                 }
             });
 
