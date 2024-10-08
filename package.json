@@ -4,19 +4,23 @@
   "description": "Hackathon",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.75.0"
   },
   "activationEvents": [
-    "onCommand:extension.generateCode"
+    "onCommand:extension.generateUnitTests"
   ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extension.generateCode",
-        "title": "Generate Code"
+        "command": "extension.generateUnitTests",
+        "title": "Generate Unit Tests"
       }
     ]
+  },
+  "dependencies": {
+    "@huggingface/inference": "^2.8.1",
+    "vscode": "^1.1.37"
   }
 }
 
