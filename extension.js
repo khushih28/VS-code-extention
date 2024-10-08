@@ -25,14 +25,14 @@ function activate(context) {
 
             // Send the prompt to the SantaCoder API to generate unit tests
             const response = await axios.post(
-                'https://api-inference.huggingface.co/models/bigcode/santacoder',
+                'https://api-inference.huggingface.co/models/bigcode/santacode',
                 {
                     inputs: prompt
                 },
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer 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` // Use environment variable
+                        'Authorization': `Bearer api_key` // Use environment variable
                     }
                 }
             );
