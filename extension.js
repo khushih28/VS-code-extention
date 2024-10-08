@@ -1,65 +1,75 @@
 const vscode = require('vscode');
 const axios = require('axios');
 
-/** 
- * @param {vscode.ExtensionContext} context 
+/**
+ * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    let disposable = vscode.commands.registerCommand('extension.generateCode', async function () {
-        const prompt = await vscode.window.showInputBox({ placeHolder: "Enter a task (e.g., 'create a Python factorial function')" });
+    let disposable = vscode.commands.registerCommand('extension.generateUnitTests', async function () {
+        // Prompt the user to enter a code snippet
+        const codeSnippet = await vscode.window.showInputBox({
+            placeHolder: "Enter a code snippet (e.g., a Python function to add two numbers)",
+            prompt: "Make sure to enter a complete function for best results."
+        });
 
-        if (!prompt) {
-            vscode.window.showInformationMessage("No prompt entered.");
+        if (!codeSnippet) {
+            vscode.window.showInformationMessage("No code snippet entered.");
             return;
         }
 
-        vscode.window.showInformationMessage(`Sending request to API for: "${prompt}"`);
+        vscode.window.showInformationMessage("Unit tests generation in progress...");
 
         try {
-            const response = await axios.post('https://api-inference.huggingface.co/models/bigcode/santacoder', {
-                inputs: prompt,
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer Your_api_key`,
+            // Create a more detailed prompt to guide the model
+            const prompt = `Generate comprehensive unit tests for the following Python function:\n${codeSnippet}\n\nPlease ensure that all edge cases are covered.`;
+
+            // Send the prompt to the SantaCoder API to generate unit tests
+            const response = await axios.post(
+                'https://api-inference.huggingface.co/models/bigcode/santacoder',
+                {
+                    inputs: prompt
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer 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` // Use environment variable
+                    }
                 }
-            });
+            );
 
-            // Log the full response to inspect its structure
-            console.log('Full response from API:', response.data);
+            // Log the full response for debugging
+            console.log('Full API response:', response.data);
 
-            let code;
-            if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].generated_text) {
-                code = response.data[0].generated_text.trim();
+            let generatedTests = '';
+            if (response.data && response.data.generated_text) {
+                generatedTests = response.data.generated_text.trim();
+            } else if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].generated_text) {
+                generatedTests = response.data[0].generated_text.trim();
             } else {
-                code = 'No code returned from the API.';
+                generatedTests = 'No valid unit tests returned from the API.';
             }
 
-            console.log('Generated code:', code);
+            console.log('Generated unit tests:', generatedTests);
 
             const editor = vscode.window.activeTextEditor;
 
             if (editor) {
-                editor.edit(editBuilder => {
-                    // Insert code at the active cursor position
-                    editBuilder.insert(editor.selection.active, code);
-                }).then(success => {
-                    if (success) {
-                        vscode.window.showInformationMessage('Code successfully generated and inserted.');
-                    } else {
-                        vscode.window.showWarningMessage('Failed to insert generated code.');
-                    }
+                // Insert the generated unit tests into the active editor
+                await editor.edit(editBuilder => {
+                    editBuilder.insert(editor.selection.active, generatedTests);
                 });
+                vscode.window.showInformationMessage('Unit tests successfully generated and inserted.');
             } else {
-                vscode.window.showWarningMessage('No active editor found. Unable to insert generated code.');
+                vscode.window.showWarningMessage('No active editor found. Unable to insert generated unit tests.');
             }
         } catch (error) {
             if (error.response) {
-                vscode.window.showErrorMessage(`API request failed with status: ${error.response.status}`);
+                console.error('Error response data:', error.response.data);
+                vscode.window.showErrorMessage(`API request failed: ${error.response.status} - ${error.response.data.error || 'Unknown error'}`);
             } else if (error.request) {
                 vscode.window.showErrorMessage('No response received from API.');
             } else {
-                vscode.window.showErrorMessage('Error generating code: ' + error.message);
+                vscode.window.showErrorMessage('Error generating unit tests: ' + error.message);
             }
         }
     });
@@ -75,6 +85,8 @@ module.exports = {
     activate,
     deactivate
 };
+
+
 
 
 
